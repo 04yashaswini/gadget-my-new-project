@@ -1,0 +1,66 @@
+[
+  {
+    "id": 1,
+    "name": "Wireless Earbuds Pro",
+    "cat": "Audio",
+    "price": 4999,
+    "icon": "🎧",
+    "photo": ""
+  },
+  {
+    "id": 2,
+    "name": "Smart Watch Ultra",
+    "cat": "Wearables",
+    "price": 12999,
+    "icon": "⌚",
+    "photo": ""
+  },
+  {
+    "id": 3,
+    "name": "Mechanical Keyboard",
+    "cat": "Accessories",
+    "price": 3499,
+    "icon": "⌨️",
+    "photo": ""
+  },
+  {
+    "id": 4,
+    "name": "4K Action Camera",
+    "cat": "Cameras",
+    "price": 8999,
+    "icon": "📷",
+    "photo": ""
+  },
+  {
+    "id": 5,
+    "name": "Gaming Mouse",
+    "cat": "Accessories",
+    "price": 1999,
+    "icon": "🖱️",
+    "photo": ""
+  },
+  {
+    "id": 6,
+    "name": "Bluetooth Speaker",
+    "cat": "Audio",
+    "price": 2999,
+    "icon": "🔊",
+    "photo": ""
+  },
+  {
+    "id": 7,
+    "name": "Power Bank 20000mAh",
+    "cat": "Accessories",
+    "price": 1799,
+    "icon": "🔋",
+    "photo": ""
+  },
+  {
+    "id": 8,
+    "name": "Smartphone X5",
+    "cat": "Phones",
+    "price": 24999,
+    "icon": "📱",
+    "photo": ""
+  }
+]

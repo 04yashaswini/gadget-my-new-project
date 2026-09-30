@@ -1,0 +1,73 @@
+<!DOCTYPE html><html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>GadgetHub</title>
+<style>
+:root{--p:#ff5c8a;--o:#ff9a4d;--c:#fff6e9;--i:#3b2a2f;--g:linear-gradient(135deg,var(--p),var(--o))}
+*{box-sizing:border-box;margin:0;font-family:system-ui,sans-serif}
+body{background:radial-gradient(circle at 8% 0,#ffd6e2,transparent 40%),radial-gradient(circle at 92% 8%,#ffe0c2,transparent 40%),var(--c);color:var(--i);min-height:100vh;padding:clamp(12px,3vw,32px)}
+main{max-width:1100px;margin:auto;display:grid;gap:18px}
+.card{background:#fffc;backdrop-filter:blur(10px);border:1px solid #fff;border-radius:20px;padding:18px;box-shadow:0 10px 30px #ff5c8a22}
+.t{background:var(--g);-webkit-background-clip:text;background-clip:text;color:transparent}
+h1{font-size:clamp(1.6rem,4vw,2.4rem)}
+.top{display:flex;flex-wrap:wrap;gap:12px;align-items:center;justify-content:space-between}
+nav{display:flex;gap:6px;background:#fffc;padding:5px;border-radius:99px;border:1px solid #fff}
+button{border:0;color:#fff;background:var(--g);padding:10px 18px;border-radius:12px;cursor:pointer;font-weight:600;box-shadow:0 6px 16px #ff5c8a44}
+nav button{background:none;color:var(--i);box-shadow:none;border-radius:99px}nav .on{background:var(--g);color:#fff}
+.ghost{background:#ffe3d1;color:#d9531e;box-shadow:none;padding:8px 14px}
+.stats,.grid{display:grid;gap:14px;grid-template-columns:repeat(auto-fit,minmax(200px,1fr))}
+.stat small{color:#9a7b76}.stat b{display:block;font-size:1.7rem}
+form{display:flex;flex-wrap:wrap;gap:10px}
+input{flex:1 1 150px;padding:11px 14px;border:1px solid #ffd3bd;border-radius:12px;background:#fff;font-size:.95rem}
+.chips{display:flex;gap:8px;flex-wrap:wrap}.chips .on{background:var(--g);color:#fff}
+.pc{display:grid;gap:8px;transition:.2s}.pc:hover{transform:translateY(-4px)}
+.pic{height:130px;border-radius:14px;background:linear-gradient(135deg,#ffe3ec,#ffedd9);display:grid;place-items:center;font-size:3.6rem;overflow:hidden}
+.pic img{width:100%;height:100%;object-fit:cover}
+.tag{justify-self:start;padding:2px 10px;border-radius:99px;background:#ffe3d1;color:#d9531e;font-size:.75rem}
+.pr{display:flex;justify-content:space-between;align-items:center;gap:6px;flex-wrap:wrap}.pr b{font-size:1.2rem}
+#cart{position:fixed;top:0;right:0;height:100%;width:min(92vw,360px);background:var(--c);padding:22px;box-shadow:-10px 0 40px #3b2a2f33;transform:translateX(105%);transition:.3s;overflow:auto;z-index:9}
+#cart.open{transform:none}
+.row{display:flex;justify-content:space-between;align-items:center;gap:8px;padding:10px 0;border-bottom:1px dashed #ffd3bd}
+.row button{padding:4px 10px}
+#cn{background:#fff;color:var(--p);border-radius:99px;padding:0 8px;margin-left:4px}
+</style></head><body><main>
+<header class="top"><h1 class="t">⚡ GadgetHub</h1>
+<nav><button data-a="mode" data-id="client">🛍️ Client</button><button data-a="mode" data-id="admin">🛠️ Admin</button></nav>
+<button id="cb" data-a="cart">🛒 Cart<span id="cn">0</span></button></header>
+<section id="v" style="display:grid;gap:18px"></section>
+<aside id="cart"></aside>
+</main>
+<script>
+let P=<%- JSON.stringify(products).replace(/</g,'\\u003c') %>,mode='client',cat='All',q='',E=null,O=[],C=JSON.parse(localStorage.c||'{}');
+const $=s=>document.querySelector(s),f=n=>'₹'+Math.round(n).toLocaleString('en-IN'),
+x=s=>String(s??'').replace(/[&<>"']/g,c=>'&#'+c.charCodeAt()+';'),
+J=u=>fetch(u).then(r=>r.json()),
+card=(p,b)=>`<div class="card pc"><div class="pic">${p.photo?`<img src="/uploads/${x(p.photo)}">`:x(p.icon||'📦')}</div><span class="tag">${x(p.cat)}</span><h3>${x(p.name)}</h3><div class="pr"><b class="t">${f(p.price)}</b><span>${b}</span></div></div>`,
+btn=(a,id,l,c='')=>`<button class="${c}" data-a="${a}" data-id="${id}">${l}</button>`,
+grid=()=>$('#g').innerHTML=P.filter(p=>(cat=='All'||p.cat==cat)&&p.name.toLowerCase().includes(q)).map(p=>card(p,btn('add',p.id,'＋ Add'))).join('')||'<p class="card">No gadgets found 🌸</p>';
+
+function draw(){
+  const L=Object.entries(C).map(([id,n])=>[P.find(p=>p.id==id),n]).filter(([p])=>p),T=L.reduce((a,[p,n])=>a+p.price*n,0);
+  $('#cn').textContent=L.reduce((a,[,n])=>a+n,0);$('#cb').hidden=mode!='client';
+  document.querySelectorAll('nav button').forEach(b=>b.classList.toggle('on',b.dataset.id==mode));
+  $('#v').innerHTML=mode=='client'
+  ?`<div class="card"><input placeholder="🔍 Search gadgets" value="${x(q)}" oninput="q=this.value.toLowerCase();grid()" style="width:100%;margin-bottom:12px"><div class="chips">${['All',...new Set(P.map(p=>p.cat))].map(c=>btn('cat',c,x(c),c==cat?'on':'ghost')).join('')}</div></div><div id="g" class="grid"></div>`
+  :`<div class="stats">${[['📦 Products',P.length],['🧾 Orders',O.length],['💰 Revenue',f(O.reduce((a,o)=>a+o.total,0))]].map(([k,v])=>`<div class="card stat"><small>${k}</small><b class="t">${v}</b></div>`).join('')}</div>
+  <form class="card" enctype="multipart/form-data">${[['name','Product name'],['price','Price ₹','number'],['cat','Category'],['icon','Emoji 🎧']].map(([n,p,t])=>`<input name="${n}" type="${t||'text'}" placeholder="${p}" value="${x(E?.[n])}" required>`).join('')}<input name="photo" type="file" accept="image/*"><button>${E?'💾 Save':'＋ Add product'}</button>${E?btn('cancel',0,'Cancel','ghost'):''}</form>
+  <div class="grid">${P.map(p=>card(p,btn('edit',p.id,'✏️','ghost')+' '+btn('del',p.id,'🗑️'))).join('')}</div>`;
+  if(mode=='client')grid();
+  $('#cart').innerHTML=`<h2 class="t">Your cart</h2>`+(L.map(([p,n])=>`<div class="row"><span>${x(p.icon)} ${x(p.name)}<br><small>${f(p.price)}</small></span><span>${btn('dec',p.id,'−')} ${n} ${btn('inc',p.id,'+')}</span></div>`).join('')||'<p style="margin:14px 0">Empty for now 🌸</p>')+`<h3 style="margin:14px 0">Total: ${f(T)}</h3>${L.length?btn('buy',0,'Checkout'):''} ${btn('cart',0,'Close','ghost')}`;
+}
+document.onclick=async e=>{const b=e.target.closest('[data-a]');if(!b)return;const{a,id}=b.dataset;
+  if(a=='mode'){mode=id;E=null;if(id=='admin')O=await J('/api/orders')}
+  if(a=='cat')cat=id;
+  if(a=='add'||a=='inc')C[id]=(C[id]||0)+1;
+  if(a=='dec'&&!--C[id])delete C[id];
+  if(a=='edit'){E=P.find(p=>p.id==id);scrollTo({top:0,behavior:'smooth'})}
+  if(a=='cancel')E=null;
+  if(a=='del'&&confirm('Delete this product?')){await fetch('/api/products/'+id,{method:'DELETE'});P=P.filter(p=>p.id!=id);delete C[id]}
+  if(a=='cart')$('#cart').classList.toggle('open');
+  if(a=='buy'){const items=Object.entries(C).map(([id,n])=>({...P.find(p=>p.id==id),n})),total=items.reduce((s,i)=>s+i.price*i.n,0);
+    await fetch('/api/orders',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({items,total})});C={};$('#cart').classList.remove('open');alert('Order placed 🎉')}
+  localStorage.c=JSON.stringify(C);draw()};
+document.onsubmit=async e=>{e.preventDefault();
+  await fetch('/api/products'+(E?'/'+E.id:''),{method:E?'PUT':'POST',body:new FormData(e.target)});P=await J('/api/products');E=null;draw()};
+draw();
+</script></body></html>
